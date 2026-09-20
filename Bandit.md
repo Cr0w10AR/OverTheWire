@@ -191,3 +191,30 @@ Le decimos que las primeras (A-M) se vuelven (N-Z), y las segundas (N-Z) se vuel
 Se escribe así: 'N-ZA-Mn-za-m'
 
 Contraseña para Bandit 12: **GROozWPO8QyN0mGrjUkID0WCYkZiQxrN** 
+
+## Bandit 12
+
+Para conseguir la contraseña, el objetivo fue revertir un volcado hexadecimal y quitar múltiples capas de compresión ocultas. El proceso fue:
+
+1. Reversión inicial: Usé xxd -r para convertir el texto hexadecimal (data.txt) de vuelta a un archivo binario funcional.
+
+2. Ciclo de descompresión: Apliqué un bucle de tres comandos repetitivamente sobre cada nuevo archivo generado:
+
+ - file: Para descubrir el formato real (gzip, bzip2 o tar).
+
+ - mv: Para renombrar el archivo y agregarle la extensión obligatoria (.gz, .bz2 o .tar).
+
+ - gzip -d / bzip2 -d / tar -xf: Para quitar la capa de compresión o desempaquetar.
+
+3. Resultado: Repetí este proceso a través de 8 capas distintas hasta que el comando file indicó finalmente texto ASCII. Al hacer cat sobre este último archivo, encontré la contraseña plana.
+
+```bash
+bandit12@bandit:/tmp/tmp.SAgZRjPmUT$ file data8
+data8: ASCII text
+bandit12@bandit:/tmp/tmp.SAgZRjPmUT$ cat data8
+The password is qQYQiHOBPR8zR61qxYqX45quvihF2uzk
+bandit12@bandit:/tmp/tmp.SAgZRjPmUT$ 
+```
+
+Contraseña para Bandit 13: **qQYQiHOBPR8zR61qxYqX45quvihF2uzk** 
+
