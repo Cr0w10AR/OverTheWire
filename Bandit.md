@@ -157,3 +157,37 @@ bandit10@bandit:~$ base64 -d data.txt
 Contraseña para Bandit 11: **pYfOY6HwUsDj5rL9UvyhU7MCmv8vN5Ro**
 
 ## Bandit 11
+
+Para este reto debiamos leer el archivo cifrado en **ROT13**
+
+### Detalles a considerar
+Si divides el alfabeto a la mitad, obtienes dos bloques de 13 letras:
+
+1. Primera mitad: A, B, C, D, E, F, G, H, I, J, K, L, M
+
+2. Segunda mitad: N, O, P, Q, R, S, T, U, V, W, X, Y, Z
+
+La regla de ROT13 es mover cada letra 13 lugares hacia adelante.
+
+- Si tomas la A (posición 1) y sumas 13, llegas a la N (posición 14).
+
+- Si tomas la N (posición 14) y sumas 13, llegas a la posición 27. Como el alfabeto termina en 26, "das la vuelta" y llegas nuevamente a la A (posición 1).
+
+---
+
+en este nivel usaremos el comando **"tr"** que nos permite traducir los caracteres, este comando recibe atraves de tuberias ("<" o "|" )
+
+lo hice de la siguiente manera:
+
+```bash
+bandit11@bandit:~$ cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+```
+1. El Conjunto 1 (Alfabeto normal):
+Le decimos que busque todas las letras, de la A a la Z (mayúsculas) y de la a a la z (minúsculas).
+Se escribe así: 'A-Za-z'
+
+2. El Conjunto 2 (Alfabeto desplazado):
+Le decimos que las primeras (A-M) se vuelven (N-Z), y las segundas (N-Z) se vuelven (A-M). Lo mismo para minúsculas.
+Se escribe así: 'N-ZA-Mn-za-m'
+
+Contraseña para Bandit 12: **GROozWPO8QyN0mGrjUkID0WCYkZiQxrN** 
