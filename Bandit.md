@@ -520,6 +520,19 @@ KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI
 Contraseña para bandit 19: **KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI**
 
 ## Bandit 19
+Utilizar un archivo ejecutable preconfigurado en el sistema para leer un archivo protegido al que nuestro usuario actual no tiene acceso.
+
+La contraseña del siguiente nivel está alojada en /etc/bandit_pass/bandit20. El usuario actual (bandit19) no posee permisos de lectura sobre este archivo. Sin embargo, en el directorio local existe un archivo ejecutable llamado bandit20-do que pertenece al usuario bandit20 y posee el bit SUID (Set-User-ID) activado en sus permisos (-rwsr-x---).
 
 
+```bash
+# 1. Comprobar cómo funciona el binario local
+./bandit20-do
 
+# 2. Utilizar el binario para inyectar el comando 'cat' sobre el archivo protegido
+./bandit20-do cat /etc/bandit_pass/bandit20
+```
+
+Contraseña para Bandit 20: **4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA**
+
+## Bandit 20
