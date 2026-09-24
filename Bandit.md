@@ -495,7 +495,7 @@ Para este nivel se uso el comando "**diff**" de la siguiente manera
 
  Contraseña para Bandit 18: **OQxXZjELndr90zuhOTDYBEomI0SZITXI**
 
- ## Bandit 19
+ ## Bandit 18
 >  La contraseña para el siguiente nivel se almacena en un archivo readme en El directorio de casa. Desafortunadamente, alguien ha modificado .bashrc Para cerrar la sesión cuando inicie sesión con SSH.
 
 Solo es necesario listar el directorio en el que se entra y se realiza un cat a ese archivo para saber la contreseña:
@@ -517,7 +517,7 @@ KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI
 
 ```
 
-Contraseña para bandit 20: **KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI**
+Contraseña para bandit 19: **KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI**
 
 ## Bandit 20
 
