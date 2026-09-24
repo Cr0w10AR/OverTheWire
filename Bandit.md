@@ -451,3 +451,73 @@ bandit15@bandit:~$
 Contraseña del nivel Bandit 16: **kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V**
 
 ## Bandit 16
+
+el objetivo de este nivel es el siguiente: Identificar un servicio SSL oculto en el rango de puertos 31000-32000, evadiendo puertos señuelo, para enviar la contraseña actual y capturar una llave privada RSA que permita el acceso al siguiente nivel.
+
+```bash
+nmap localhost -p 31000-32000 -sV
+```
+*El puerto 31790 se identificó como ssl/unknown, revelando su propósito real al quejarse en el banner por no recibir una contraseña.*
+Para interactuar con el puerto cifrado y evitar cuelgues en el modo interactivo del cliente, se combinó echo con openssl usando una tubería (|).
+Esto inyecta el texto y fuerza al servidor a devolver la respuesta al instante.
+
+```bash
+echo "kS0Hf0u5HiXFwKMKFqXvPdOTNGGa0X8V" | openssl s_client -connect localhost:31790 -quiet
+```
+*El servidor devolvió un bloque de texto correspondiente a una llave privada RSA (-----BEGIN OPENSSH PRIVATE KEY-----).*
+
+Se extrajo la llave a la máquina local y se configuró bajo la estricta política de permisos que exige el protocolo SSH para archivos de identidad: 
+
+```bash
+nano llave17.key
+chmod 600 llave17.key
+ssh -i llave17.key bandit17@bandit.labs.overthewire.org -p 2220
+```
+Una vez iniciada la sesión exitosamente como bandit17, se recuperó la contraseña del siguiente nivel.
+
+```bash
+cat /etc/bandit_pass/bandit17
+```
+Contraseña bandit 17: **pWXMAZoxGC8JmDMfmT5MGEsobMM3vnj2**
+
+## Bandit 17
+
+>  Hay 2 archivos en el directorio home: passwords.old y passwords.new. La contraseña para el siguiente nivel está en passwords.new y es la única línea que se ha cambiado entre passwords.old y passwords.new
+
+Para este nivel se uso el comando "**diff**" de la siguiente manera
+
+```bash
+ bandit17@bandit:~$ diff passwords.new passwords.old
+42c42
+< OQxXZjELndr90zuhOTDYBEomI0SZITXI
+> qOg5pVOjPx9x9VccyYBADiT4xxyoUB8D
+```
+
+ Contraseña para Bandit 18: **OQxXZjELndr90zuhOTDYBEomI0SZITXI**
+
+ ## Bandit 19
+>  La contraseña para el siguiente nivel se almacena en un archivo readme en El directorio de casa. Desafortunadamente, alguien ha modificado .bashrc Para cerrar la sesión cuando inicie sesión con SSH.
+
+Solo es necesario listar el directorio en el que se entra y se realiza un cat a ese archivo para saber la contreseña:
+
+```bash
+bandit18@bandit.labs.overthewire.org's password: 
+total 24
+drwxr-xr-x   2 root     root     4096 Jun 24 14:58 .
+drwxr-xr-x 150 root     root     4096 Jun 24 15:02 ..
+-rw-r--r--   1 root     root      220 Feb 13  2026 .bash_logout
+-rw-r-----   1 bandit19 bandit18 3874 Jun 24 14:58 .bashrc
+-rw-r--r--   1 root     root      807 Feb 13  2026 .profile
+-rw-r-----   1 bandit19 bandit18   33 Jun 24 14:58 readme
+
+╭─ /home                               ✔  23s  root@Cuervito  01:35:39 ─╮
+
+bandit18@bandit.labs.overthewire.org's password: 
+KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI
+
+```
+
+Contraseña para bandit 20: **KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI**
+
+## Bandit 20
+
