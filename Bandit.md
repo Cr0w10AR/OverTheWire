@@ -519,5 +519,7 @@ KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI
 
 Contraseña para bandit 19: **KpsOfPkcP7i1FlIExk2QEjyt6dw8dxZI**
 
-## Bandit 20
+## Bandit 19
+
+
 
