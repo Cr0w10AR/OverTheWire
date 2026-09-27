@@ -536,3 +536,60 @@ La contraseña del siguiente nivel está alojada en /etc/bandit_pass/bandit20. E
 Contraseña para Bandit 20: **4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA**
 
 ## Bandit 20
+
+Interactuar con un binario SUID que actúa como cliente de red. El binario se conecta a un puerto local especificado, lee la contraseña del nivel actual y, si es correcta, transmite la contraseña del siguiente nivel a través de la misma conexión.
+Para mantener el flujo de datos bidireccional abierto, se requiere instanciar el Listener en una terminal interactiva y ejecutar el binario cliente desde una segunda terminal concurrente.
+
+en la primera terminal utilice netcat en modo escucha en el puerto 4444 de la sigueinte manera:
+
+```bash
+bandit20@bandit:~$ nc -lvnp 4444
+Listening on 0.0.0.0 4444
+```
+abri otra terminal para poder ejecutar ese binario en el mismo puerto:
+
+```bash
+bandit20@bandit:~$ ./suconnect 4444
+```
+
+al hacer lo anterior el la primera terminal se indico que recibi la llamada del binario y alli colocar la contraseña de bandit20, y asi el binario me entrego la contraseña de bandit 21:
+
+```bash
+bandit20@bandit:~$ nc -lvnp 4444
+Listening on 0.0.0.0 4444
+Connection received on 127.0.0.1 37496
+4pIjcunZ0fK2vmp3IwfG8Vf7VhxD6pOA
+bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY
+bandit20@bandit:~$ Connection received on 127.0.0.1 36620
+```
+
+Contraseña para Bandit 21: **bW9kBv5WC3P4yoDyf12LSdGuNz5ka6hY**
+
+## Bandit 21 
+
+Rastrear una tarea automatizada del sistema (Cron) configurada por el administrador para comprender su lógica, identificar qué archivos manipula y aprovechar su ejecución privilegiada para extraer la contraseña del siguiente nivel.
+
+No tenemos acceso directo para leer la contraseña del usuario bandit22. Sin embargo, el sistema cuenta con un demonio planificador (cron) que ejecuta tareas repetitivas en segundo plano. La clave está en inspeccionar el directorio de configuraciones globales de cron (/etc/cron.d/), descubrir qué scripts está ejecutando el usuario objetivo de manera automática y seguir el rastro del código.
+
+Al analizar el archivo de configuración cronjob_bandit22, descubrimos que cada minuto se ejecuta un script en Bash. Al leer ese script, revelamos que toma la contraseña protegida y la deposita en un archivo temporal en /tmp/ con permisos de lectura pública (chmod 644).
+
+```bash
+# 1. Explorar las tareas programadas por el sistema para bandit22
+cat /etc/cron.d/cronjob_bandit22
+
+# (Salida): * * * * * bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+
+# 2. Inspeccionar el código fuente del script automatizado
+cat /usr/bin/cronjob_bandit22.sh
+
+# (Salida): 
+# #!/bin/bash
+# chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+# cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+
+# 3. Leer el archivo de destino que generó el script
+cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+```
+La contraseña es revelada en texto plano gracias a la ejecución automática del script.
+
+Contraseña para bandit 22: **RYVux2rHEm9tiXHmLFzuR7Vhx6AZQMEz**
