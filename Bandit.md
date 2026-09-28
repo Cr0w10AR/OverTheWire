@@ -8,7 +8,7 @@ ssh bandit0@bandit.labs.overthewire.org -p 2220
 ```
 luego al hacer ```ls``` dentro del directorio, habia un archivo "readme" donde contenia la contraseña
 
-Contraseña para bandit 1: **6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR** (sin las comillas)
+Contraseña para bandit 1: **6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR**
 
 ## Bandit1
 
