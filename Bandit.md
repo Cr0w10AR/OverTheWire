@@ -727,3 +727,102 @@ Contraseña para Bandit 29: **Em7eGtqaMySwNFjCpwzzHhLhospOcdt0**
 
 ## Bandit 29
 
+Resolución del nivel 29 al 30 identificando y extrayendo credenciales alojadas en una rama de desarrollo remota que no había sido fusionada (merged) con la rama principal.
+
+Al inspeccionar el historial de la rama principal (master), se observó que la contraseña real nunca fue expuesta en esa línea de tiempo; el desarrollador había subido un texto de prueba *(<no passwords in production!>)*. Sin embargo, en el control de versiones, el trabajo suele separarse en distintas ramas. Era altamente probable que las credenciales originales se hubieran utilizado y guardado en una rama paralela (como dev).
+
+Se listaron todas las ramas disponibles en el repositorio, tanto locales como remotas. Al identificar una rama de desarrollo (remotes/origin/dev), se utilizó el comando de cambio de contexto para que Git actualizara el directorio de trabajo con el estado de dicha rama, revelando el archivo README.md original que contenía la contraseña.
+
+```bash
+# 1. Dentro del repositorio clonado, listar todas las ramas (incluso las ocultas/remotas)
+git branch -a
+
+# 2. Cambiar el directorio de trabajo (Working Directory) a la rama de desarrollo
+git checkout remotes/origin/dev
+
+# 3. Leer el archivo actualizado por Git, que ahora contiene la flag real
+cat README.md
+```
+
+Contraseña para Bandit 30: **jq9Dfg2rXsfYsWMgFuKlXhphjdH7USgX**
+
+## Bandit 30
+
+Al examinar el repositorio clonado, la rama principal no contenía información útil, y no existían ramas alternativas de desarrollo ni registros de credenciales borradas en el historial de commits. Git ofrece un mecanismo de etiquetado diseñado para marcar puntos específicos en la historia (como versiones de lanzamiento v1.0). Los desarrolladores pueden adjuntar mensajes de texto plano directamente a estas etiquetas. En este nivel, la contraseña fue almacenada dentro de un tag oculto a simple vista.
+
+Se listaron las etiquetas disponibles en el repositorio, revelando una etiqueta inusual denominada *"secret"*. Utilizando el comando de inspección de objetos de Git, se examinaron los metadatos de dicha etiqueta para revelar la flag del siguiente nivel.
+
+```bash
+# 1. Clonar el repositorio en la máquina local
+git clone ssh://bandit30-git@bandit.labs.overthewire.org:2220/home/bandit30-git/repo
+
+# 2. Entrar al directorio del repositorio
+cd repo
+
+# 3. Listar todas las etiquetas (tags) disponibles
+git tag
+# (El sistema devuelve la existencia del tag "secret")
+
+# 4. Inspeccionar el contenido del tag para leer el mensaje adjunto
+git show secret
+```
+
+Contraseña para Bandit 31: **82NkymblpGBYmIXG6ZQ8YldBYstHpfUf**
+
+## Bandit 31
+
+Resolución del nivel 31 al 32 enviando (push) un archivo modificado a un repositorio remoto, requiriendo la evasión de reglas de exclusión y la configuración de identidad del entorno local.
+
+El reto exigía crear un archivo key.txt con un contenido específico y subirlo al servidor. Sin embargo, el repositorio contaba con un archivo .gitignore configurado para bloquear cualquier archivo con extensión *.txt*. Para superarlo, fue necesario forzar la inclusión del archivo mediante la bandera **-f**, configurar temporalmente las credenciales de autor de Git para permitir el empaquetado (commit), y enviarlo. El servidor utiliza un script de validación (pre-receive hook) que lee el contenido del push en el aire, devuelve la contraseña en la terminal si es correcto, y luego rechaza la escritura para mantener el repositorio intacto para otros jugadores.
+
+```bash
+# 1. Crear el archivo con el texto exacto solicitado
+echo "May I come in?" > key.txt
+
+# 2. Forzar la adición del archivo ignorando la restricción de .gitignore
+git add -f key.txt
+
+# 3. Configurar una identidad temporal de Git (necesaria para firmar el commit)
+git config user.email "jugador@bandit.com"
+git config user.name "jugador"
+
+# 4. Crear el paquete (commit) y enviarlo al servidor (push)
+git commit -m "Mi pase"
+git push
+
+# (El pre-receive hook del servidor imprime la flag pWuj5jBQ6IgV0NXwiH6g1pXRF8S1YvbT en la consola y cancela la subida)
+```
+
+Contraseña para Bandit 32: **pWuj5jBQ6IgV0NXwiH6g1pXRF8S1YvbT**
+
+## Bandit 32
+
+Resolución del nivel 32 al 33 evadiendo una shell personalizada (UPPERCASE SHELL) que interceptaba el input del usuario y convertía todas las letras a mayúsculas antes de ejecutarlas, impidiendo el uso de comandos estándar de Linux.
+
+Dado que comandos como ls, cat o sh se transformaban en LS, CAT o SH (los cuales no existen en el sistema), era imposible interactuar de forma tradicional. La vulnerabilidad de este filtro es que solo afecta a caracteres alfabéticos. Se puede aprovechar la expansión de variables de entorno nativas de Linux que utilizan símbolos y números, como $0 (que hace referencia al ejecutable del proceso actual).
+
+Se inyectó la variable $0 en el prompt. Al no contener letras, el filtro la procesó intacta. La shell evaluó la variable y ejecutó su contenido (/bin/sh), invocando una nueva terminal estándar interactiva sin la restricción de mayúsculas.
+
+```bash
+# 1. En el prompt restringido, inyectar la variable del proceso actual
+>> $0
+
+# 2. La variable invoca una nueva consola estándar limpia ($)
+$ cat /etc/bandit_pass/bandit33
+
+```
+Contraseña para Bandit 33: **u4P2CyPOwPGLe94RdD9Uo2FxFwvnFswM**
+
+## Bandit 33
+
+**La progresión a través de los 33 niveles de Bandit consolidó habilidades prácticas fundamentales en la administración de sistemas Linux, análisis de configuraciones, manipulación avanzada de control de versiones (Git), evasión de entornos restringidos y escalada de privilegios local (explotación de SUID y cronjobs). Dominar las mecánicas del sistema operativo a este nivel proporciona una base técnica profunda que fortalece directamente las capacidades defensivas, agilizando el análisis en operaciones de SOC y aportando contexto crítico para investigaciones avanzadas de threat hunting.**
+
+```bash
+# Lectura del mensaje final del servidor
+cat README.txt
+
+# Resultado:
+# "Congratulations on solving the last level of this game!"
+# Proyecto completado a la espera de nuevos niveles.
+```
+
