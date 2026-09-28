@@ -665,4 +665,41 @@ Contraseña para bandit 26: **jHdv2ELQhT22BkprMNDjybZDAkw1zeBJ**
 
 ## Bandit 26
 
+aprovechando un archivo con permisos SUID (Set-user Identification). Debido a que la restricción del entorno seguía activa, fue necesario repetir la técnica de evasión de shell para establecer una conexión estable. Una vez dentro, se localizó un binario ejecutable que permitía correr comandos con los privilegios del usuario objetivo.
+Tras escapar de la restricción del paginador more mediante Vim y acceder a una terminal interactiva, se utilizó el ejecutable local bandit27-do para leer el archivo de contraseñas de bandit27.
+```bash
+# 1. Repetir el Shell Escape al iniciar sesión (ventana pequeña, 'v' en --More--, :set shell=/bin/bash, :sh).
+
+# 2. Listar los archivos para identificar el binario SUID
+ls -la
+# (Se observa que ./bandit27-do tiene permisos -rwsr-x--- y pertenece a bandit27)
+
+# 3. Ejecutar un comando a través del binario para leer la flag con privilegios elevados
+./bandit27-do cat /etc/bandit_pass/bandit27
+```
+
+Contraseña Bandit 27: **STJLJBRRphMxKB392CT4iOr5CbzPU9ER**
+
+## Bandit 27
+
+El objetivo consistía en descargar (clonar) un repositorio remoto vía SSH para inspeccionar sus archivos en busca de la contraseña.
+
+El desafío principal radicaba en una restricción de seguridad del servidor: las conexiones SSH hacia localhost estaban bloqueadas para conservar recursos. Esto obligaba a comprender la diferencia entre el entorno remoto y el local, requiriendo que la extracción del repositorio se hiciera directamente desde la máquina física local del usuario, apuntando a la dirección pública de OverTheWire.
+
+Desde una terminal local, se clonó el repositorio utilizando el puerto específico del juego (2220) y las credenciales de bandit27. Una vez descargada la carpeta, se inspeccionó su contenido para encontrar la flag.
+
+```bash
+# 1. Desde la terminal de la máquina local física, clonar el repositorio remoto
+git clone ssh://bandit27-git@bandit.labs.overthewire.org:2220/home/bandit27-git/repo
+
+# 2. Ingresar la contraseña de bandit27 cuando el servidor la solicite para autenticar
+
+# 3. Acceder al directorio descargado y leer el archivo principal
+cd repo
+cat README
+```
+
+Contraseña Bandit 28: **y8Yd2ssKcpHpud7UvOSOxwamRMzIGIeQ**
+
+## Bandit 28
 
