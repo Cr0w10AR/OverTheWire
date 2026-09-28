@@ -703,3 +703,27 @@ Contraseña Bandit 28: **y8Yd2ssKcpHpud7UvOSOxwamRMzIGIeQ**
 
 ## Bandit 28
 
+Resolución del nivel 28 al 29 extrayendo información sensible desde el historial de modificaciones de un repositorio Git.
+
+Al inspeccionar el archivo README.md, la contraseña se mostraba censurada (xxxxxxxxxx). Sin embargo, al tratarse de un sistema de control de versiones, todo cambio queda registrado de forma inmutable. El desarrollador cometió el error de subir las credenciales reales en un commit previo y luego intentó "parcharlo" sobrescribiendo el texto, ignorando que la versión original seguiría siendo accesible en el historial.
+
+Se examinó el registro de commits pidiendo a Git que mostrara las diferencias (diffs) exactas de cada actualización. Esto reveló el commit titulado "fix info leak", donde se documentaba claramente la eliminación de la contraseña real y su reemplazo por las "x".
+
+```bash
+# 1. Clonar el repositorio en la máquina local
+git clone ssh://bandit28-git@bandit.labs.overthewire.org:2220/home/bandit28-git/repo
+
+# 2. Entrar al directorio del repositorio
+cd repo
+
+# 3. Mostrar el historial de commits junto con las diferencias de código (parches)
+git log -p
+
+# (En el output se localiza la línea eliminada en rojo con la flag original:
+# - password: Em7eGtqaMySwNFjCpwzzHhLhospOcdt0)
+```
+
+Contraseña para Bandit 29: **Em7eGtqaMySwNFjCpwzzHhLhospOcdt0**
+
+## Bandit 29
+
