@@ -65,5 +65,26 @@ ln -s /etc/leviathan_pass/leviathan3 clave
 
 Contraseña para Leviathan 3: **PiEpxxknZH**
 
+## Leviathan 3
+
+El análisis estático inicial con strings sobre el binario ./level3 reveló múltiples posibles contraseñas (kaka, secret, bomb). Para evitar el ensayo y error y determinar la lógica real de validación, se recurrió a la depuración con ltrace. El trazado demostró que las credenciales evidentes actuaban como señuelos, y la función strcmp validaba el input del usuario contra la cadena snlprintf.
+
+```bash
+# 1. Rastrear las llamadas a librerías del binario
+ltrace ./level3
+
+# 2. Identificar la comparación real en el output (se usó "secret" como prueba)
+# strcmp("secret\n", "snlprintf\n") = -1
+
+# 3. Ejecutar el binario e ingresar la contraseña verdadera para spawnear la shell
+./level3
+# Enter the password> snlprintf
+# [You've got shell]!
+
+# 4. Leer la flag del siguiente nivel
+cat /etc/leviathan_pass/leviathan4
+```
+
+Contraseña Leviathan 4: **XIyBbRwAPt**
 
 
