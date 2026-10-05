@@ -115,3 +115,45 @@ Contraseña Natas 7: **B1szg95UcTnrzwnF3i3TzYHlyYh8iBV0**
 
 ## Natas 7
 
+La aplicación web utiliza un esquema de enrutamiento dinámico mediante la URL (index.php?page=home). Al inspeccionar el comportamiento, se identificó que el backend toma el valor del parámetro GET page y lo pasa directamente a una función de inclusión de PHP (como include() o require()) para renderizar el contenido en la vista principal. Al no existir una validación de entrada, sanitización, ni un mapeo seguro de directorios permitidos, la función es vulnerable a la inyección de rutas absolutas del sistema operativo subyacente.
+
+Se detectó un comentario en el código fuente que revelaba la ruta absoluta de la credencial objetivo (/etc/natas_webpass/natas8). Utilizando curl, se manipuló la petición GET sustituyendo el nombre de la página legítima por la ruta del archivo del sistema. El servidor web procesó la directiva incluyó el contenido del archivo de contraseñas de Linux en el flujo HTML de respuesta, exponiendo la flag en texto plano.
+
+```bash
+# Explotación de LFI manipulando el parámetro GET 'page'
+curl -u natas7:[PASSWORD] "http://natas7.natas.labs.overthewire.org/index.php?page=/etc/natas_webpass/natas8"
+```
+
+Contraseña Natas 8:**ugXL95KQmUAJJj6bMezOlBNDyI9Imwkc**
+
+## Natas 8
+
+El código fuente expuesto reveló una variable $encodedSecret codificada de forma rígida (hardcoded) y una rutina de validación que ofusca la entrada del usuario antes de la comparación lógica. La vulnerabilidad radica en que la función utilizada (bin2hex(strrev(base64_encode($secret)))) no aplica un algoritmo de hashing unidireccional y criptográficamente seguro (como bcrypt o SHA-256), sino una secuencia de transformaciones de formato totalmente reversibles. Esta falla de diseño de "Seguridad por Oscuridad" permite a cualquier atacante desandar el camino y recuperar el texto original.
+
+Se examinó la rutina de ofuscación de la aplicación web y se estructuró la cadena de comandos inversos en la terminal. Utilizando tuberías (pipes) con herramientas nativas de Linux (xxd, rev, base64), se transformó la variable estática desde su estado hexadecimal a texto, se invirtió la cadena de caracteres y finalmente se decodificó su base64. El secreto en texto plano resultante (oubWYf2kBq) fue inyectado posteriormente mediante una petición POST para eludir la validación del servidor y capturar la flag del nivel 9.
+
+```bash
+# 1. Ingeniería inversa del secreto ofuscado mediante CLI
+echo "3d3d516343746d4d6d6c315669563362" | xxd -r -p | rev | base64 -d
+# Resultado: oubWYf2kBq
+
+# 2. Envío del secreto decodificado simulando el formulario web
+curl -u natas8:[PASSWORD] --data "secret=oubWYf2kBq&submit=1" http://natas8.natas.labs.overthewire.org/
+```
+
+Contraseña para Natas 9: **UdxmI27dTaXmnd1rxKQTfws6jihTdcQ9**
+
+# Natas 9
+
+La revisión del código fuente evidenció el uso de la función passthru() de PHP para ejecutar una instrucción de búsqueda en la terminal del sistema subyacente (grep -i $key dictionary.txt). La aplicación asigna el valor del parámetro HTTP needle (capturado vía $_REQUEST) directamente a la variable $key. Al no implementar mecanismos de validación ni escape de comandos (como escapeshellcmd() o escapeshellarg()), el flujo de ejecución es vulnerable a la inyección de metacaracteres de control de bash (como el separador de comandos ;), lo que permite forzar al servidor a ejecutar instrucciones arbitrarias.
+
+Se construyó una petición HTTP POST mediante curl, mapeando correctamente el parámetro esperado por la aplicación web (needle). Se inyectó un vector de ataque que cerraba el comando grep inicial y concatenaba una instrucción de lectura (cat /etc/natas_webpass/natas10). El servidor procesó la entrada, ejecutó los comandos de forma secuencial e imprimió el contenido del archivo de contraseñas de Linux directamente en la respuesta HTML, exponiendo la flag del siguiente nivel.
+
+```bash
+# Explotación de OSCI concatenando comandos en el parámetro 'needle'
+curl -u natas9:[PASSWORD] -d "needle=; cat /etc/natas_webpass/natas10" http://natas9.natas.labs.overthewire.org/
+```
+Contraseña Natas 10: **EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv** 
+
+## Natas 10
+
