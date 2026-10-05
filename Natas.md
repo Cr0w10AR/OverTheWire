@@ -157,3 +157,17 @@ Contraseña Natas 10: **EgjlkzB6E8LJyf2Obt4q7q4ewt5ZWSNv**
 
 ## Natas 10
 
+El código fuente intentó mitigar la vulnerabilidad de Inyección de Comandos (OSCI) bloqueando los metacaracteres de concatenación de Bash (;, |, &). Sin embargo, el comando base grep -i $key dictionary.txt continuó recibiendo la entrada del usuario (needle) sin escapar ni sanitizar los espacios en blanco. Esto permite alterar el comportamiento lógico de grep, forzándolo a interpretar las cadenas inyectadas no como un único patrón de búsqueda, sino como múltiples rutas de archivos objetivo. Es un fallo clásico de validación insuficiente, donde se aplica una lista negra (blacklist) incompleta en lugar de tratar la entrada estrictamente como un argumento de texto mediante funciones como escapeshellarg().
+
+Se estructuró una carga útil (. /etc/natas_webpass/natas11) a través del parámetro HTTP POST needle. El punto (.) actuó como una expresión regular comodín para garantizar la máxima coincidencia de texto, mientras que el espacio en blanco instruyó a grep a buscar dentro de una segunda ruta especificada. El comando subyacente resultante fue grep -i . /etc/natas_webpass/natas11 dictionary.txt, obligando al servidor a procesar el archivo restringido y exponer la contraseña de Natas 11 en la salida estándar.
+
+```bash
+# Evasión del filtro inyectando un patrón (regex) y una ruta absoluta como argumentos adicionales
+curl -u natas10:[PASSWORD] -d "needle=. /etc/natas_webpass/natas11" http://natas10.natas.labs.overthewire.org/index.php
+
+# Resultado de la extracción:
+# /etc/natas_webpass/natas11:VUMQDmuITOEHzhviLE5V0VG9cPMQkyxd
+```
+
+## Natas 11
+
