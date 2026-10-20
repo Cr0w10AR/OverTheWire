@@ -171,3 +171,26 @@ curl -u natas10:[PASSWORD] -d "needle=. /etc/natas_webpass/natas11" http://natas
 
 ## Natas 11
 
+La aplicación guarda en la cookie `data` un JSON cifrado con XOR repetido y codificado en Base64.
+
+1. Consultamos `index-source.html` y obtenemos el formato:
+   ```json
+   {"showpassword":"no","bgcolor":"#ffffff"}
+   ```
+2. Desciframos la cookie inicial usando el texto conocido y recuperamos la clave XOR: `kBSw`.
+3. Cambiamos `showpassword` a `yes`, volvemos a cifrar y enviamos la cookie modificada.
+
+```bash
+curl -u 'natas11:<password>' \
+  -H 'Cookie: data=EGAgHwQ1IxYYMSQYGSZxTUk7NgRJbnEVDCE8GwQwcU1JYTURDSQ1EUk/' \
+  'http://natas11.natas.labs.overthewire.org/'
+```
+
+El servidor revela la contraseña del nivel 12.
+
+
+Contraseña para Natas 12: **EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng**
+
+## Natas 12
+
+Contarseña para Bandit 13: **g8ba0olAzaSJuyS4gnmbdVVigAICLG1k** 
